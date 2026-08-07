@@ -77,7 +77,7 @@ resource "aws_lambda_permission" "allow_s3" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.classifier.function_name
   principal     = "s3.amazonaws.com"
-  
+
   # tfsec fix: Prevent confused deputy attack by restricting to the specific account
   # In a real environment, you should also restrict by source_arn of the specific buckets
   source_account = data.aws_caller_identity.current.account_id
