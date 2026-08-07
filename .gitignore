@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+env/
+.env
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.tfstate.lock.info
+crash.log
+
+# Node & Next.js (Frontend)
+node_modules/
+.next/
+out/
+build/
+.DS_Store
+
+# LocalStack / Docker volume
+volume/
+*.log
+
+# Misc
+.vscode/
+.idea/
+*.pdf

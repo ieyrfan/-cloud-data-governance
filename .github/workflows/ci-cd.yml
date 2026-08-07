@@ -1,0 +1,63 @@
+name: Enterprise Cloud Security CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  security-and-testing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest boto3 rich fastapi uvicorn mangum reportlab
+
+      - name: Run Pytest (Unit Testing)
+        run: |
+          pytest tests/
+
+      - name: Terraform Format Check
+        uses: hashicorp/setup-terraform@v2
+      - run: terraform fmt -check -recursive
+        working-directory: ./terraform
+
+      - name: Infrastructure Security Scan (tfsec)
+        uses: aquasecurity/tfsec-action@v1.0.0
+        with:
+          working_directory: ./terraform
+
+  deploy-infrastructure:
+    needs: security-and-testing
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./terraform/environments/dev
+
+      - name: Terraform Plan & Apply
+        run: |
+          terraform plan -out=tfplan
+          terraform apply -auto-approve tfplan
+        working-directory: ./terraform/environments/dev
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: "us-east-1"

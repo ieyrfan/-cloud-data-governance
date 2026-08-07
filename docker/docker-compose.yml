@@ -1,0 +1,40 @@
+version: "3.8"
+services:
+  localstack:
+    image: localstack/localstack:2.3.0
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      - DEBUG=1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "../src:/opt/code/localstack/src" # mount source code
+
+  aws-cli:
+    image: amazon/aws-cli
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+    entrypoint: /bin/sh -c "while true; do sleep 1000; done"
+    volumes:
+      - "../src:/opt/code/src"
+      - "../scripts:/opt/code/scripts"
+    depends_on:
+      - localstack
+
+  python-dev:
+    image: python:3.11-slim
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+      - LOCALSTACK_ENDPOINT=http://localstack:4566
+    entrypoint: /bin/sh -c "while true; do sleep 1000; done"
+    volumes:
+      - "../src:/app/src"
+      - "../scripts:/app/scripts"
+    working_dir: /app
