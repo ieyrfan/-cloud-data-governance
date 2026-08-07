@@ -1,8 +1,8 @@
 resource "aws_dynamodb_table" "classification_results" {
-  name           = var.table_name
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "resource_id"
-  range_key      = "version_id"
+  name         = var.table_name
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "resource_id"
+  range_key    = "version_id"
 
   attribute {
     name = "resource_id"
@@ -20,10 +20,10 @@ resource "aws_dynamodb_table" "classification_results" {
   }
 
   global_secondary_index {
-    name               = "SensitivityIndex"
-    hash_key           = "sensitivity_level"
-    range_key          = "resource_id"
-    projection_type    = "ALL"
+    name            = "SensitivityIndex"
+    hash_key        = "sensitivity_level"
+    range_key       = "resource_id"
+    projection_type = "ALL"
   }
 
   point_in_time_recovery {

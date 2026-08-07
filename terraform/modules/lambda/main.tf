@@ -27,18 +27,18 @@ resource "aws_iam_role_policy" "lambda_inline_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = ["s3:GetObject"]
+        Effect   = "Allow"
+        Action   = ["s3:GetObject"]
         Resource = ["*"] # Narrow this down in production
       },
       {
-        Effect = "Allow"
-        Action = ["dynamodb:PutItem"]
+        Effect   = "Allow"
+        Action   = ["dynamodb:PutItem"]
         Resource = ["*"]
       },
       {
-        Effect = "Allow"
-        Action = ["comprehend:DetectPiiEntities"]
+        Effect   = "Allow"
+        Action   = ["comprehend:DetectPiiEntities"]
         Resource = ["*"]
       }
     ]
